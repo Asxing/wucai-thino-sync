@@ -1,24 +1,26 @@
 # Wucai Thino Sync
 
-一个 Obsidian 插件，用于将 [五彩 (WuCai)](https://www.dotalk.cn/product/wucai) Daily Note 中的个人感悟自动同步到 [Thino](https://github.com/Quorafind/Obsidian-Thino) 格式，让你的零碎想法通过 Thino 完美展现。
+[中文文档](./README-zh.md)
 
-## ✨ 功能特性
+An Obsidian plugin that automatically syncs personal insights from [WuCai](https://www.dotalk.cn/product/wucai) Daily Notes to [Thino](https://github.com/Quorafind/Obsidian-Thino) format, perfectly displaying your fleeting thoughts through Thino.
 
-- 📝 自动解析 WuCai Daily Note 中 `## Daily note` 部分的时间戳条目
-- 🔄 将每条感悟转换为独立的 Thino 笔记文件
-- 🏷️ 自动添加 `#wucai` 标签便于筛选
-- ⏰ 支持手动同步和自动同步两种模式
-- 📅 可配置扫描天数，默认只处理最近 7 天的笔记
-- 🔒 智能去重，已同步的条目不会重复处理
-- 💾 冲突处理：已存在的 Thino 文件会自动跳过
+## ✨ Features
 
-## 📋 前置要求
+- 📝 Automatically parse timestamp entries under the `## Daily note` section in WuCai Daily Notes
+- 🔄 Convert each insight into an independent Thino note file
+- 🏷️ Automatically add `#wucai` tag for easy filtering
+- ⏰ Support both manual and automatic sync modes
+- 📅 Configurable scan days, default to process only the last 7 days
+- 🔒 Smart deduplication, synced entries won't be processed again
+- 💾 Conflict handling: existing Thino files will be skipped
 
-本插件需要配合以下两个插件使用：
+## 📋 Prerequisites
 
-### 1. 五彩 (WuCai) 插件
+This plugin requires the following two plugins:
 
-需要开启 **日更同步配置**（官方默认配置），模板格式如下：
+### 1. WuCai Plugin
+
+Enable the **Daily Note sync configuration** (official default), template format:
 
 ```jinja2
 {% block highlights %}
@@ -26,38 +28,38 @@
 ## Daily note
 {{ highlights | style_dailynote }}
 {% else %}
-## 划线列表
+## Highlights
 {% for item in highlights %}
-{{ item | style1({prefix:"> ", anno:"> __想法__：", color:"█  "}) }}
+{{ item | style1({prefix:"> ", anno:"> __Thought__: ", color:"█  "}) }}
 {% endfor %}
 {% endif %}
 {% endblock %}
 ```
 
-WuCai 会生成类似以下格式的 Daily Note 文件：
+WuCai generates Daily Note files in the following format:
 
-**文件名格式**: `Daily Note YYYY-MM-DD-YYYYMMDD.md`
+**Filename format**: `Daily Note YYYY-MM-DD-YYYYMMDD.md`
 
-**文件内容格式**:
+**Content format**:
 ```markdown
 ## Daily note
 
 - 2025-12-04 10:30
-    这是我的一条感悟内容...
+    This is my insight content...
 
 - 2025-12-04 14:15
-    这是另一条感悟内容...
+    This is another insight content...
 ```
 
-### 2. Thino 插件
+### 2. Thino Plugin
 
-需要开启 **Multi 模式**，并指定 Thino 笔记存放的文件夹。
+Enable **Multi mode** and specify the folder for Thino notes.
 
-Thino Multi 模式会将每条笔记存储为独立的 Markdown 文件，本插件生成的文件格式如下：
+Thino Multi mode stores each note as an independent Markdown file. This plugin generates files in the following format:
 
-**文件名格式**: `YYYYMMDD-{16位ID}.md`
+**Filename format**: `YYYYMMDD-{16-char ID}.md`
 
-**文件内容格式**:
+**Content format**:
 ```yaml
 ---
 id: a1b2c3d4e5f6g7h8
@@ -67,100 +69,100 @@ thinoType: JOURNAL
 tags: [wucai]
 ---
 
-这是我的一条感悟内容...
+This is my insight content...
 ```
 
-## 🚀 安装方法
+## 🚀 Installation
 
-### 手动安装
+### Manual Installation
 
-1. 下载最新的 Release（`main.js`, `manifest.json`, `styles.css`）
-2. 在 Vault 中创建文件夹：`.obsidian/plugins/wucai-thino-sync/`
-3. 将下载的文件复制到该文件夹
-4. 重启 Obsidian
-5. 在 **Settings → Community plugins** 中启用 `Wucai Thino Sync`
+1. Download the latest Release (`main.js`, `manifest.json`, `styles.css`)
+2. Create folder in your Vault: `.obsidian/plugins/wucai-thino-sync/`
+3. Copy the downloaded files to that folder
+4. Restart Obsidian
+5. Enable `Wucai Thino Sync` in **Settings → Community plugins**
 
-### 从 dist 目录安装
+### Install from dist directory
 
 ```bash
-cp dist/* <你的Vault>/.obsidian/plugins/wucai-thino-sync/
+cp dist/* <your-vault>/.obsidian/plugins/wucai-thino-sync/
 ```
 
-## ⚙️ 配置说明
+## ⚙️ Configuration
 
-在 **Settings → Wucai Thino Sync** 中进行配置：
+Configure in **Settings → Wucai Thino Sync**:
 
-| 设置项 | 说明 | 默认值 |
-|--------|------|--------|
-| **Enable sync** | 启用/禁用同步功能 | 关闭 |
-| **Sync mode** | 同步模式：Manual(手动) / Automatic(自动) | Manual |
-| **Auto sync interval** | 自动同步间隔（分钟） | 30 |
-| **Scan days** | 扫描天数，0 表示扫描全部 | 7 |
-| **Sync on startup** | Obsidian 启动时自动同步 | 关闭 |
-| **WuCai folder** | WuCai Daily Note 存放路径 | 需手动配置 |
-| **Thino folder** | Thino 笔记存放路径 | 需手动配置 |
-| **Debug mode** | 启用调试日志 | 关闭 |
+| Setting | Description | Default |
+|---------|-------------|---------|
+| **Enable sync** | Enable/disable sync functionality | Off |
+| **Sync mode** | Sync mode: Manual / Automatic | Manual |
+| **Auto sync interval** | Auto sync interval (minutes) | 30 |
+| **Scan days** | Days to scan, 0 means scan all | 7 |
+| **Sync on startup** | Auto sync when Obsidian starts | Off |
+| **WuCai folder** | WuCai Daily Note folder path | Required |
+| **Thino folder** | Thino notes folder path | Required |
+| **Debug mode** | Enable debug logging | Off |
 
-## 📖 使用方法
+## 📖 Usage
 
-### 方式一：手动同步
+### Method 1: Manual Sync
 
-1. 点击左侧栏的 **同步图标** (🔄)
-2. 或使用命令面板 (Ctrl/Cmd + P) 运行 `Sync WuCai to Thino`
+1. Click the **sync icon** (🔄) in the left ribbon
+2. Or use Command Palette (Ctrl/Cmd + P) and run `Sync WuCai to Thino`
 
-### 方式二：自动同步
+### Method 2: Automatic Sync
 
-1. 在设置中将 **Sync mode** 改为 `Automatic`
-2. 设置 **Auto sync interval** 为期望的间隔时间
-3. 开启 **Enable sync**
+1. Set **Sync mode** to `Automatic` in settings
+2. Set **Auto sync interval** to your desired interval
+3. Enable **Enable sync**
 
-### 重置同步状态
+### Reset Sync State
 
-如果需要重新处理所有文件，可以在设置中点击 **Reset** 按钮清除同步记录。
+To reprocess all files, click the **Reset** button in settings to clear sync records.
 
-## 🔧 开发
+## 🔧 Development
 
 ```bash
-# 安装依赖
+# Install dependencies
 npm install
 
-# 开发模式（监听文件变化）
+# Development mode (watch for changes)
 npm run dev
 
-# 生产构建
+# Production build
 npm run build
 
-# 打包到 dist 目录
+# Package to dist directory
 mkdir -p dist && cp main.js manifest.json styles.css dist/
 ```
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 wucai-thino-sync/
-├── main.ts                      # 插件入口
+├── main.ts                      # Plugin entry point
 ├── src/
-│   ├── settings.ts              # 设置接口和默认值
-│   ├── types.ts                 # TypeScript 类型定义
+│   ├── settings.ts              # Settings interface and defaults
+│   ├── types.ts                 # TypeScript type definitions
 │   ├── parsers/
-│   │   └── daily-note-parser.ts # WuCai 文件解析器
+│   │   └── daily-note-parser.ts # WuCai file parser
 │   ├── sync/
-│   │   ├── sync-service.ts      # 同步服务主逻辑
-│   │   └── thino-converter.ts   # Thino 格式转换器
+│   │   ├── sync-service.ts      # Main sync service
+│   │   └── thino-converter.ts   # Thino format converter
 │   └── ui/
-│       └── settings-tab.ts      # 设置面板 UI
-└── dist/                        # 打包输出目录
+│       └── settings-tab.ts      # Settings panel UI
+└── dist/                        # Build output directory
 ```
 
-## 🤝 相关项目
+## 🤝 Related Projects
 
-- [五彩 WuCai](https://www.dotalk.cn/product/wucai) - 网页划线与笔记工具
-- [Obsidian Thino](https://github.com/Quorafind/Obsidian-Thino) - 灵感捕捉与闪念笔记
+- [WuCai](https://www.dotalk.cn/product/wucai) - Web highlighting and note-taking tool
+- [Obsidian Thino](https://github.com/Quorafind/Obsidian-Thino) - Idea capture and fleeting notes
 
-## 📄 许可证
+## 📄 License
 
 MIT License
 
-## 🙏 致谢
+## 🙏 Acknowledgments
 
-感谢五彩和 Thino 插件为 Obsidian 用户带来的优秀体验。
+Thanks to WuCai and Thino plugins for bringing excellent experiences to Obsidian users.
