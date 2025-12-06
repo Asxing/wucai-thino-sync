@@ -117,7 +117,7 @@ export class ThinoConverter {
      */
     private normalizeContent(content: string): string {
         // 统一换行符
-        let normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const normalized = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
         // 去除行首尾多余空白，但保留内容结构
         const lines = normalized.split('\n');

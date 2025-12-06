@@ -187,7 +187,7 @@ export class WuCaiParser {
      * @param folderPath 文件夹路径
      * @param scanDays 扫描天数（0 表示扫描全部）
      */
-    async findWuCaiFiles(folderPath: string, scanDays: number = 0): Promise<TFile[]> {
+    async findWuCaiFiles(folderPath: string, scanDays = 0): Promise<TFile[]> {
         const files: TFile[] = [];
         const folder = this.app.vault.getAbstractFileByPath(folderPath);
 
@@ -270,7 +270,7 @@ export async function parseWuCaiFile(app: App, file: TFile): Promise<WuCaiEntry[
  * @param folderPath 文件夹路径
  * @param scanDays 扫描天数（0 表示扫描全部）
  */
-export async function findWuCaiFiles(app: App, folderPath: string, scanDays: number = 0): Promise<TFile[]> {
+export async function findWuCaiFiles(app: App, folderPath: string, scanDays = 0): Promise<TFile[]> {
     const parser = new WuCaiParser(app);
     return parser.findWuCaiFiles(folderPath, scanDays);
 }
