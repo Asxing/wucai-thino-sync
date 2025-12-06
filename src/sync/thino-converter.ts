@@ -3,7 +3,8 @@
  * Thino 格式转换器：将 WuCai 条目转换为 Thino 文件格式，生成确定性 ID
  */
 
-import { WuCaiEntry, ThinoFile, ThinoFrontmatter, CONFIG } from '../types';
+import { ThinoFile, ThinoFrontmatter, CONFIG } from '../types';
+import type { WuCaiEntry } from '../types';
 
 /**
  * Thino 格式转换器
@@ -239,7 +240,7 @@ export function batchConvertEntries(entries: WuCaiEntry[]): {
     for (const entry of entries) {
         try {
             if (entry.contentLines.length === 0 || entry.contentLines.every(line => !line.trim())) {
-                console.debug(`[Thino Converter] Skipping empty entry: ${entry.timestamp}`);
+                console.debug(`[Thino Converter] Skipping empty entry: ${entry.timestamp.toISOString()}`);
                 continue;
             }
 
@@ -247,7 +248,7 @@ export function batchConvertEntries(entries: WuCaiEntry[]): {
             successful.push(thinoFile);
         } catch (e) {
             const errorMsg = `Conversion failed: ${e}`;
-            console.warn(`[Thino Converter] Entry conversion failed ${entry.timestamp}: ${errorMsg}`);
+            console.warn(`[Thino Converter] Entry conversion failed ${entry.timestamp.toISOString()}: ${errorMsg}`);
             failed.push({ entry, error: errorMsg });
         }
     }

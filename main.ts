@@ -3,7 +3,7 @@
  * 将 WuCai Daily Note 中的个人感悟同步到 Thino 格式
  */
 
-import { App, Notice, Plugin } from 'obsidian';
+import { Notice, Plugin } from 'obsidian';
 import { WucaiThinoSyncSettings, DEFAULT_SETTINGS } from './src/settings';
 import { WucaiThinoSyncService } from './src/sync/sync-service';
 import { WucaiThinoSyncSettingTab } from './src/ui/settings-tab';
@@ -14,7 +14,7 @@ export default class WucaiThinoSyncPlugin extends Plugin {
     private autoSyncIntervalId: number | null = null;
 
     async onload() {
-        console.log('Loading Wucai Thino Sync plugin');
+        console.debug('Loading Wucai Thino Sync plugin');
 
         // 加载设置
         await this.loadSettings();
@@ -41,7 +41,7 @@ export default class WucaiThinoSyncPlugin extends Plugin {
         });
 
         this.addCommand({
-            id: 'reset-wucai-thino-sync-state',
+            id: 'reset-sync-state',
             name: 'Reset sync state',
             callback: async () => {
                 await this.syncService.resetSyncState();
@@ -55,12 +55,10 @@ export default class WucaiThinoSyncPlugin extends Plugin {
         // 启动时同步
         if (this.settings.enableSync && this.settings.syncOnStartup) {
             // 延迟执行以确保 Vault 已完全加载
-            this.registerInterval(
-                window.setTimeout(async () => {
-                    console.log('[Wucai Thino Sync] Running startup sync...');
-                    await this.manualSync();
-                }, 5000) as unknown as number
-            );
+            window.setTimeout(() => {
+                console.debug('[Wucai Thino Sync] Running startup sync...');
+                this.manualSync().catch(e => console.error('[Wucai Thino Sync] Startup sync error:', e));
+            }, 5000);
         }
 
         // 启动自动同步
@@ -70,7 +68,7 @@ export default class WucaiThinoSyncPlugin extends Plugin {
     }
 
     onunload() {
-        console.log('Unloading Wucai Thino Sync plugin');
+        console.debug('Unloading Wucai Thino Sync plugin');
         this.stopAutoSync();
     }
 
@@ -116,19 +114,18 @@ export default class WucaiThinoSyncPlugin extends Plugin {
         }
 
         const intervalMs = this.settings.autoSyncInterval * 60 * 1000;
-        console.log(`[Wucai Thino Sync] Starting auto sync with interval: ${this.settings.autoSyncInterval} minutes`);
+        console.debug(`[Wucai Thino Sync] Starting auto sync with interval: ${this.settings.autoSyncInterval} minutes`);
 
         this.autoSyncIntervalId = this.registerInterval(
-            window.setInterval(async () => {
-                console.log('[Wucai Thino Sync] Running auto sync...');
-                try {
-                    const result = await this.syncService.syncAll();
+            window.setInterval(() => {
+                console.debug('[Wucai Thino Sync] Running auto sync...');
+                this.syncService.syncAll().then(result => {
                     if (result.createdFiles > 0) {
                         new Notice(`Auto sync: ${result.createdFiles} entries synced`);
                     }
-                } catch (e) {
+                }).catch(e => {
                     console.error('[Wucai Thino Sync] Auto sync error:', e);
-                }
+                });
             }, intervalMs)
         );
     }
@@ -140,7 +137,7 @@ export default class WucaiThinoSyncPlugin extends Plugin {
         if (this.autoSyncIntervalId !== null) {
             window.clearInterval(this.autoSyncIntervalId);
             this.autoSyncIntervalId = null;
-            console.log('[Wucai Thino Sync] Auto sync stopped');
+            console.debug('[Wucai Thino Sync] Auto sync stopped');
         }
     }
 

@@ -3,8 +3,6 @@
  * 数据结构定义：WuCai条目、Thino文件、同步游标等核心数据模型
  */
 
-import { TFile } from 'obsidian';
-
 /**
  * WuCai Daily Note 中的单个时间戳条目
  */

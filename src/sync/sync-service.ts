@@ -3,10 +3,10 @@
  * 主同步服务：协调各模块，执行同步操作
  */
 
-import { App, TFile, Notice } from 'obsidian';
+import { App, TFile } from 'obsidian';
 import { WuCaiParser, findWuCaiFiles } from '../parsers/daily-note-parser';
 import { ThinoConverter, batchConvertEntries, validateThinoContent } from './thino-converter';
-import { WuCaiEntry, ThinoFile, SyncResult, ProcessedEntry, SyncCursor } from '../types';
+import { ThinoFile, SyncResult } from '../types';
 import { WucaiThinoSyncSettings } from '../settings';
 
 /**

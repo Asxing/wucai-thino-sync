@@ -3,7 +3,7 @@
  * 设置面板 UI
  */
 
-import { App, PluginSettingTab, Setting, Notice, TFolder } from 'obsidian';
+import { PluginSettingTab, Setting, Notice, TFolder, Modal, App } from 'obsidian';
 import type WucaiThinoSyncPlugin from '../../main';
 
 export class WucaiThinoSyncSettingTab extends PluginSettingTab {
@@ -18,7 +18,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: 'Wucai Thino Sync Settings' });
+        new Setting(containerEl).setName('Wucai Thino Sync settings').setHeading();
 
         // === 同步开关 ===
         new Setting(containerEl)
@@ -84,7 +84,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
         // === 扫描天数 ===
         new Setting(containerEl)
             .setName('Scan days')
-            .setDesc('Only scan Daily Notes from the last N days (0 = scan all files)')
+            .setDesc('Only scan daily notes from the last N days (0 = scan all files)')
             .addText(text => text
                 .setPlaceholder('7')
                 .setValue(String(this.plugin.settings.scanDays))
@@ -94,12 +94,12 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 }));
 
-        containerEl.createEl('h3', { text: 'Folder Settings' });
+        new Setting(containerEl).setName('Folder settings').setHeading();
 
         // === WuCai 文件夹 ===
         new Setting(containerEl)
             .setName('WuCai folder')
-            .setDesc('The folder where WuCai Daily Notes are stored (relative to vault root)')
+            .setDesc('The folder where WuCai daily notes are stored (relative to vault root)')
             .addText(text => text
                 .setPlaceholder('00-Inbox/external-sync/WuCai')
                 .setValue(this.plugin.settings.wucaiFolder)
@@ -130,14 +130,14 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                     this.openFolderSuggestModal('thinoFolder');
                 }));
 
-        containerEl.createEl('h3', { text: 'Sync Actions' });
+        new Setting(containerEl).setName('Sync actions').setHeading();
 
         // === 手动同步按钮 ===
         new Setting(containerEl)
             .setName('Manual sync')
             .setDesc('Manually trigger a sync operation')
             .addButton(button => button
-                .setButtonText('Sync Now')
+                .setButtonText('Sync now')
                 .setCta()
                 .onClick(async () => {
                     button.setDisabled(true);
@@ -153,7 +153,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                         new Notice(`Sync error: ${e}`);
                     } finally {
                         button.setDisabled(false);
-                        button.setButtonText('Sync Now');
+                        button.setButtonText('Sync now');
                     }
                 }));
 
@@ -161,7 +161,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
         const status = this.plugin.syncService.getSyncStatus();
         new Setting(containerEl)
             .setName('Sync status')
-            .setDesc(`Total processed: ${status.totalProcessed} | Failed: ${status.failedEntries} | Skipped: ${status.skippedEntries}`)
+            .setDesc(`Total processed: ${status.totalProcessed} | failed: ${status.failedEntries} | skipped: ${status.skippedEntries}`)
             .addButton(button => button
                 .setButtonText('Refresh')
                 .onClick(() => {
@@ -177,7 +177,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
             });
         }
 
-        containerEl.createEl('h3', { text: 'Advanced' });
+        new Setting(containerEl).setName('Advanced').setHeading();
 
         // === 调试模式 ===
         new Setting(containerEl)
@@ -197,12 +197,18 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
             .addButton(button => button
                 .setButtonText('Reset')
                 .setWarning()
-                .onClick(async () => {
-                    if (confirm('Are you sure you want to reset the sync state? This will re-process all files on the next sync.')) {
-                        await this.plugin.syncService.resetSyncState();
-                        new Notice('Sync state has been reset');
-                        this.display();
-                    }
+                .onClick(() => {
+                    const modal = new ConfirmModal(
+                        this.app,
+                        'Reset sync state',
+                        'Are you sure you want to reset the sync state? This will re-process all files on the next sync.',
+                        async () => {
+                            await this.plugin.syncService.resetSyncState();
+                            new Notice('Sync state has been reset');
+                            this.display();
+                        }
+                    );
+                    modal.open();
                 }));
     }
 
@@ -218,13 +224,116 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
             }
         });
 
-        // 简单的弹窗让用户选择（这里可以用更好的UI，但保持简单）
         const currentValue = this.plugin.settings[settingKey];
-        const newValue = prompt('Enter folder path:', currentValue);
-        if (newValue !== null) {
-            this.plugin.settings[settingKey] = newValue;
-            this.plugin.saveSettings();
-            this.display();
-        }
+        const modal = new FolderInputModal(
+            this.app,
+            'Enter folder path',
+            currentValue,
+            async (newValue) => {
+                this.plugin.settings[settingKey] = newValue;
+                await this.plugin.saveSettings();
+                this.display();
+            }
+        );
+        modal.open();
+    }
+}
+
+/**
+ * 确认对话框 Modal
+ */
+class ConfirmModal extends Modal {
+    private title: string;
+    private message: string;
+    private onConfirm: () => void;
+
+    constructor(app: App, title: string, message: string, onConfirm: () => void) {
+        super(app);
+        this.title = title;
+        this.message = message;
+        this.onConfirm = onConfirm;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl('h3', { text: this.title });
+        contentEl.createEl('p', { text: this.message });
+
+        const buttonContainer = contentEl.createDiv({ cls: 'modal-button-container' });
+        
+        buttonContainer.createEl('button', { text: 'Cancel' })
+            .addEventListener('click', () => this.close());
+        
+        const confirmBtn = buttonContainer.createEl('button', { 
+            text: 'Confirm', 
+            cls: 'mod-warning' 
+        });
+        confirmBtn.addEventListener('click', () => {
+            this.onConfirm();
+            this.close();
+        });
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
+    }
+}
+
+/**
+ * 文件夹输入 Modal
+ */
+class FolderInputModal extends Modal {
+    private title: string;
+    private defaultValue: string;
+    private onSubmit: (value: string) => void;
+
+    constructor(app: App, title: string, defaultValue: string, onSubmit: (value: string) => void) {
+        super(app);
+        this.title = title;
+        this.defaultValue = defaultValue;
+        this.onSubmit = onSubmit;
+    }
+
+    onOpen() {
+        const { contentEl } = this;
+        contentEl.createEl('h3', { text: this.title });
+
+        const inputEl = contentEl.createEl('input', {
+            type: 'text',
+            value: this.defaultValue,
+            cls: 'modal-input-field'
+        });
+        inputEl.style.width = '100%';
+        inputEl.style.marginBottom = '1em';
+
+        const buttonContainer = contentEl.createDiv({ cls: 'modal-button-container' });
+        
+        buttonContainer.createEl('button', { text: 'Cancel' })
+            .addEventListener('click', () => this.close());
+        
+        const submitBtn = buttonContainer.createEl('button', { 
+            text: 'Submit', 
+            cls: 'mod-cta' 
+        });
+        submitBtn.addEventListener('click', () => {
+            this.onSubmit(inputEl.value);
+            this.close();
+        });
+
+        // 支持回车提交
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                this.onSubmit(inputEl.value);
+                this.close();
+            }
+        });
+
+        inputEl.focus();
+    }
+
+    onClose() {
+        const { contentEl } = this;
+        contentEl.empty();
     }
 }
