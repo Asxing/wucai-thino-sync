@@ -1,7 +1,7 @@
 {
 	"id": "wucai-thino-sync",
 	"name": "Wucai Thino Sync",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"minAppVersion": "0.15.0",
 	"description": "Sync personal insights from Wucai Daily Notes to Thino format.",
 	"author": "Asxing",
