@@ -3,7 +3,7 @@
  * WuCai 内容解析器：解析 Daily Note 文件，提取时间戳条目
  */
 
-import { App, TFile, TFolder, Vault } from 'obsidian';
+import { App, TFile, TFolder } from 'obsidian';
 import { WuCaiEntry, CONFIG } from '../types';
 
 /**

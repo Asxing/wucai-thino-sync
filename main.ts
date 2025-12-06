@@ -45,7 +45,7 @@ export default class WucaiThinoSyncPlugin extends Plugin {
             name: 'Reset sync state',
             callback: async () => {
                 await this.syncService.resetSyncState();
-                new Notice('Sync state has been reset');
+                new Notice('Sync state has been reset.');
             },
         });
 

@@ -18,8 +18,6 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        new Setting(containerEl).setName('Wucai Thino Sync settings').setHeading();
-
         // === 同步开关 ===
         new Setting(containerEl)
             .setName('Enable sync')
@@ -94,7 +92,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings();
                 }));
 
-        new Setting(containerEl).setName('Folder settings').setHeading();
+        new Setting(containerEl).setName('Folders').setHeading();
 
         // === WuCai 文件夹 ===
         new Setting(containerEl)
@@ -130,7 +128,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                     this.openFolderSuggestModal('thinoFolder');
                 }));
 
-        new Setting(containerEl).setName('Sync actions').setHeading();
+        new Setting(containerEl).setName('Actions').setHeading();
 
         // === 手动同步按钮 ===
         new Setting(containerEl)
@@ -139,22 +137,21 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
             .addButton(button => button
                 .setButtonText('Sync now')
                 .setCta()
-                .onClick(async () => {
+                .onClick(() => {
                     button.setDisabled(true);
                     button.setButtonText('Syncing...');
-                    try {
-                        const result = await this.plugin.syncService.syncAll();
+                    this.plugin.syncService.syncAll().then(result => {
                         if (result.success) {
                             new Notice(`Sync completed: ${result.createdFiles} created, ${result.skippedEntries} skipped`);
                         } else {
                             new Notice(`Sync failed: ${result.errorMessage}`);
                         }
-                    } catch (e) {
+                    }).catch(e => {
                         new Notice(`Sync error: ${e}`);
-                    } finally {
+                    }).finally(() => {
                         button.setDisabled(false);
                         button.setButtonText('Sync now');
-                    }
+                    });
                 }));
 
         // === 同步状态 ===
@@ -202,10 +199,13 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                         this.app,
                         'Reset sync state',
                         'Are you sure you want to reset the sync state? This will re-process all files on the next sync.',
-                        async () => {
-                            await this.plugin.syncService.resetSyncState();
-                            new Notice('Sync state has been reset');
-                            this.display();
+                        () => {
+                            this.plugin.syncService.resetSyncState().then(() => {
+                                new Notice('Sync state has been reset');
+                                this.display();
+                            }).catch(e => {
+                                new Notice(`Reset failed: ${e}`);
+                            });
                         }
                     );
                     modal.open();
@@ -302,10 +302,8 @@ class FolderInputModal extends Modal {
         const inputEl = contentEl.createEl('input', {
             type: 'text',
             value: this.defaultValue,
-            cls: 'modal-input-field'
+            cls: 'wucai-thino-sync-modal-input'
         });
-        inputEl.style.width = '100%';
-        inputEl.style.marginBottom = '1em';
 
         const buttonContainer = contentEl.createDiv({ cls: 'modal-button-container' });
         

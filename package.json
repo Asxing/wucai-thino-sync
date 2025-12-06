@@ -1,6 +1,6 @@
 {
 	"name": "wucai-thino-sync",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"description": "Sync personal insights from Wucai Daily Notes to Thino format.",
 	"main": "main.js",
 	"scripts": {
