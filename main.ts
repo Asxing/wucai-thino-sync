@@ -27,14 +27,14 @@ export default class WucaiThinoSyncPlugin extends Plugin {
         );
 
         // 添加 Ribbon 图标
-        this.addRibbonIcon('sync', 'Sync WuCai to Thino', async () => {
+        this.addRibbonIcon('sync', 'Sync wucai to thino', async () => {
             await this.manualSync();
         });
 
         // 添加命令
         this.addCommand({
             id: 'sync-wucai-to-thino',
-            name: 'Sync WuCai to Thino',
+            name: 'Sync wucai to thino',
             callback: async () => {
                 await this.manualSync();
             },
@@ -92,7 +92,7 @@ export default class WucaiThinoSyncPlugin extends Plugin {
                 } else if (result.skippedEntries > 0) {
                     new Notice(`Sync completed: ${result.skippedEntries} entries already synced`);
                 } else {
-                    new Notice('Sync completed: No new entries found');
+                    new Notice('Sync completed: no new entries found');
                 }
             } else {
                 new Notice(`Sync failed: ${result.errorMessage}`);
