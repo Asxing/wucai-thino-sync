@@ -58,7 +58,7 @@ export class WucaiThinoSyncService {
 
             // 检查文件夹配置
             if (!this.settings.wucaiFolder || !this.settings.thinoFolder) {
-                result.errorMessage = 'WuCai or Thino folder not configured';
+                result.errorMessage = 'Wucai or Thino folder not configured';
                 result.success = false;
                 return result;
             }
@@ -69,11 +69,11 @@ export class WucaiThinoSyncService {
             // 查找所有 WuCai 文件（根据 scanDays 过滤）
             const wucaiFiles = await findWuCaiFiles(this.app, this.settings.wucaiFolder, this.settings.scanDays);
             if (wucaiFiles.length === 0) {
-                console.debug('[Sync Service] No WuCai files found');
+                console.debug('[Sync Service] No Wucai files found');
                 return result;
             }
 
-            console.debug(`[Sync Service] Found ${wucaiFiles.length} WuCai files (scanDays: ${this.settings.scanDays})`);
+            console.debug(`[Sync Service] Found ${wucaiFiles.length} Wucai files (scanDays: ${this.settings.scanDays})`);
 
             // 处理每个文件
             for (const file of wucaiFiles) {
