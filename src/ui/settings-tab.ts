@@ -26,7 +26,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.enableSync)
                 .onChange((value) => {
                     this.plugin.settings.enableSync = value;
-                    this.plugin.saveSettings().then(() => {
+                    void this.plugin.saveSettings().then(() => {
                         if (value) {
                             this.plugin.startAutoSync();
                         } else {
@@ -45,7 +45,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.syncMode)
                 .onChange((value: 'auto' | 'manual') => {
                     this.plugin.settings.syncMode = value;
-                    this.plugin.saveSettings().then(() => {
+                    void this.plugin.saveSettings().then(() => {
                         if (value === 'auto' && this.plugin.settings.enableSync) {
                             this.plugin.startAutoSync();
                         } else {
@@ -64,7 +64,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .onChange((value) => {
                     const interval = parseInt(value) || 30;
                     this.plugin.settings.autoSyncInterval = Math.max(1, interval);
-                    this.plugin.saveSettings().then(() => {
+                    void this.plugin.saveSettings().then(() => {
                         if (this.plugin.settings.syncMode === 'auto' && this.plugin.settings.enableSync) {
                             this.plugin.startAutoSync();
                         }
@@ -79,7 +79,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.syncOnStartup)
                 .onChange((value) => {
                     this.plugin.settings.syncOnStartup = value;
-                    this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 }));
 
         // === 扫描天数 ===
@@ -92,7 +92,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .onChange((value) => {
                     const days = parseInt(value) || 7;
                     this.plugin.settings.scanDays = Math.max(0, days);
-                    this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 }));
 
         new Setting(containerEl).setName('Folders').setHeading();
@@ -106,7 +106,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.wucaiFolder)
                 .onChange((value) => {
                     this.plugin.settings.wucaiFolder = value;
-                    this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 }))
             .addButton(button => button
                 .setButtonText('Browse')
@@ -123,7 +123,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.thinoFolder)
                 .onChange((value) => {
                     this.plugin.settings.thinoFolder = value;
-                    this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 }))
             .addButton(button => button
                 .setButtonText('Browse')
@@ -187,7 +187,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.debugMode)
                 .onChange((value) => {
                     this.plugin.settings.debugMode = value;
-                    this.plugin.saveSettings();
+                    void this.plugin.saveSettings();
                 }));
 
         // === 重置同步状态 ===
