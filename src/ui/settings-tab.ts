@@ -234,7 +234,7 @@ export class WucaiThinoSyncSettingTab extends PluginSettingTab {
             currentValue,
             (newValue) => {
                 this.plugin.settings[settingKey] = newValue;
-                this.plugin.saveSettings().then(() => {
+                void this.plugin.saveSettings().then(() => {
                     this.display();
                 });
             }
